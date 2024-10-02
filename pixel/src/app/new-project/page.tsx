@@ -1,102 +1,64 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { ImageIcon, Layers, VideoIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Stage, Layer, Image as KonvaImage, Group, Rect } from "react-konva";
-import Konva from "konva";
-
-interface HTMLVideoProps {
-  src: string;
-  width: number;
-  height: number;
-}
-
-interface MediaItem {
-  type: "image" | "video";
-  url: string;
-  position: { x: number; y: number };
-}
-
-interface StageDimensions {
-  width: number;
-  height: number;
-}
+import * as fabric from 'fabric';
+import { Canvas, Rect } from 'fabric';
+import Video from "../appComponents/Video";
 
 function Page() {
-  const [media, setMedia] = useState<MediaItem[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const parentDivRef = useRef<HTMLDivElement>(null);
-  const [stageDimensions, setStageDimensions] = useState<StageDimensions>({
-    width: 800,
-    height: 600,
-  });
-  const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
-  const [selectedItem, setSelectedItem] = useState<number | null>(null);
 
-  const setVideoRef = useCallback(
-    (index: number) => (el: HTMLVideoElement | null) => {
-      videoRefs.current[index] = el;
-    },
-    []
-  );
+  const canvasRef = useRef<any>(null);
+  const [canvas, setCanvas] = useState<any>(null);
 
-  useEffect(() => {
-    const updateStageDimensions = () => {
-      if (parentDivRef.current) {
-        const { clientWidth, clientHeight } = parentDivRef.current;
-        setStageDimensions({ width: clientWidth, height: clientHeight });
+  useEffect( () => {
+
+    if( canvasRef.current ){
+      const initCanvas = new Canvas(canvasRef.current, {
+        width: 1000,
+        height: 500,
+      });
+
+      initCanvas.backgroundColor = "#fff";
+      console.log("Logging before renderAll()");
+      initCanvas.renderAll();
+
+      console.log("Logging before setting initCanvas in the state");
+      setCanvas(initCanvas);
+      console.log("Logging after setting initCanvas in the state");
+
+      return () => {
+        initCanvas.dispose();
       }
-    };
 
-    window.addEventListener("resize", updateStageDimensions);
-    updateStageDimensions(); // Set dimensions on initial render
-
-    return () => {
-      window.removeEventListener("resize", updateStageDimensions);
-    };
-  }, []);
-
-  const handleFileUpload = (type: "image" | "video") => {
-    if (fileInputRef.current) {
-      fileInputRef.current.accept = type === "image" ? "image/*" : "video/*";
-      fileInputRef.current.click();
     }
-  };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const objectUrl = URL.createObjectURL(file);
-      const type = file.type.startsWith("image/") ? "image" : "video";
-      setMedia((prevMedia) => [
-        ...prevMedia,
-        {
-          type,
-          url: objectUrl,
-          position: {
-            x: stageDimensions.width / 2 - 100,
-            y: stageDimensions.height / 2 - 100,
-          },
-        },
-      ]);
-    } else {
-      alert("Please select a valid file.");
-    }
-  };
+  }, [] )
 
-  const handleDragEnd = (
-    index: number,
-    e: Konva.KonvaEventObject<DragEvent>
-  ) => {
-    const newMedia = [...media];
-    newMedia[index].position = { x: e.target.x(), y: e.target.y() };
-    setMedia(newMedia);
-  };
+  // const addRectangle = () => {
 
-  const handleSelect = (index: number) => {
-    setSelectedItem(index);
-  };
+  //   if(canvas){
+  //     console.log("canvas is available");
+  //   }
+  //   else{
+  //     console.log("canvas is not avlbl");
+      
+  //   }
+
+  //   if(canvas){
+  //     const rect = new Rect({
+  //       top: 100,
+  //       left: 50,
+  //       width: 100,
+  //       height: 60,
+  //       fill: "#D84D42",
+  //     });
+
+  //     canvas.add(rect);
+  //     console.log("rectangle added");
+  //   }
+  // }
 
   return (
     <div className="flex flex-col min-h-screen w-full">
@@ -112,107 +74,35 @@ function Page() {
       </nav>
 
       <main className="min-h-screen bg-gray-800 flex justify-center items-center overflow-hidden">
-        <aside className="h-[30rem] w-64 flex flex-col justify-center items-center gap-y-5 rounded-r-lg bg-gray-100 p-4">
-          {/* ADD IMAGE BUTTON */}
+        <aside className="h-[30rem] w-64 flex flex-col justify-center items-center gap-y-5 rounded-lg bg-gray-100 p-4">
+          
+          {/* IMAGE UPLOAD BUTTON */}
           <Button
-            onClick={() => handleFileUpload("image")}
-            className="w-full justify-start border border-black"
+            className="justify-start border border-black"
             variant="outline"
           >
             <ImageIcon className="mr-2 h-4 w-4" />
             Image
             <span className="sr-only">Insert Image</span>
           </Button>
-          <Button
-            onClick={() => handleFileUpload("video")}
-            className="w-full justify-start border border-black"
-            variant="outline"
-          >
-            <VideoIcon className="mr-2 h-4 w-4" />
-            Video
-            <span className="sr-only">Insert Video</span>
-          </Button>
 
-          {/* Hidden file input element */}
+          {/* VIDEO UPLOAD BUTTON AS WELL AS THE CANVAS */}
+          <Video canvas={canvas} canvasRef={canvasRef} />
+
           <input
-            ref={fileInputRef}
             type="file"
-            style={{ display: "none" }}
-            onChange={handleFileChange}
+            accept="image/*"
+            style={{ display: "none" }} 
           />
         </aside>
 
         {/* MAIN CANVAS */}
-        <section className="flex-1 overflow-auto p-4">
-          <div
-            ref={parentDivRef}
-            className="h-[37rem] w-full bg-gray-200 rounded-lg shadow-inner"
-          >
-            <Stage
-              width={stageDimensions.width}
-              height={stageDimensions.height}
-            >
-              <Layer>
-                {media.map((item, index) => {
-                  if (item.type === "image") {
-                    const img = new window.Image();
-                    img.src = item.url;
-                    return (
-                      <KonvaImage
-                        key={index}
-                        x={item.position.x}
-                        y={item.position.y}
-                        image={img}
-                        width={200}
-                        height={200}
-                        draggable
-                        onDragEnd={(e) => handleDragEnd(index, e)}
-                        onClick={() => handleSelect(index)}
-                      />
-                    );
-                  } else {
-                    return (
-                      <Group
-                        key={index}
-                        x={item.position.x}
-                        y={item.position.y}
-                        draggable
-                        onDragEnd={(e) => handleDragEnd(index, e)}
-                        onClick={() => handleSelect(index)}
-                      >
-                        <Rect width={10} height={10} fill="black" />
-                      </Group>
-                    );
-                  }
-                })}
-              </Layer>
-            </Stage>
-            {media.map(
-              (item, index) =>
-                item.type === "video" && (
-                  <video
-                    key={index}
-                    ref={setVideoRef(index)}
-                    src={item.url}
-                    width={200}
-                    height={200}
-                    controls
-                    style={{
-                      position: "absolute",
-                      left: `${item.position.x}px`,
-                      top: `${item.position.y}px`,
-                      pointerEvents: selectedItem === index ? "auto" : "none",
-                    }}
-                    onClick={() => {
-                      const video = videoRefs.current[index];
-                      if (video) {
-                        video.paused ? video.play() : video.pause();
-                      }
-                    }}
-                  />
-                )
-            )}
-          </div>
+        <section className="p-4">
+          <canvas
+            className="h-[37rem] w-full rounded-lg "
+            id="canvas"
+            ref={canvasRef}
+          ></canvas>
         </section>
       </main>
     </div>
