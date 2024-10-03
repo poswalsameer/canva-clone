@@ -8,23 +8,28 @@ import { signIn, useSession } from 'next-auth/react';
 import { useEffect } from "react"
 
 export default function Component() {
-
-  // console.log("The google client id is: ", process.env.GOOGLE_CLIENT_ID);
-  const { status } = useSession();
+  
   const router = useRouter();
 
-  const handleLogin = async () => {
-    const response = await signIn('google', { redirect: false });
-    if (response?.ok) {
-      router.push('/projects');
-    }
-  };
+  // NEXT AUTH REMOVED FOR NOW 
+  // console.log("The google client id is: ", process.env.GOOGLE_CLIENT_ID);
+  // const { status } = useSession();
+  // const handleLogin = async () => {
+  //   const response = await signIn('google', { redirect: false });
+  //   if (response?.ok) {
+  //     router.push('/projects');
+  //   }
+  // };
+  // useEffect(() => {
+  //   if (status === "authenticated") {
+  //     router.push('/projects');
+  //   }
+  // }, [status, router]);
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      router.push('/projects');
-    }
-  }, [status, router]);
+  // REMOVED NEXT AUTH CODE FOR EASIER NAVIGATION 
+  const handleLogin = () => {
+    router.push('/projects');
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-900 text-gray-100">

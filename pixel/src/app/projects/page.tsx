@@ -11,22 +11,24 @@ export default function ProjectDashboard() {
   const router = useRouter();
   const { status } = useSession();
 
+  // REMOVED AUTH FOR EASIER NAVIGATION
+  // const routeToNewProject = () => {
+  //   router.push('/new-project');
+  // }
+  // if (status === "loading") {
+  //   return <div>Loading...</div>;
+  // }
+  // if (status === "unauthenticated") {
+  //   router.push('/');
+  //   return null;
+  // }
+  // const handleLogout = () => {
+  //   signOut({ callbackUrl: '/' });
+  // };
+
   const routeToNewProject = () => {
     router.push('/new-project');
   }
-
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "unauthenticated") {
-    router.push('/');
-    return null;
-  }
-
-  const handleLogout = () => {
-    signOut({ callbackUrl: '/' });
-  };
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -38,7 +40,7 @@ export default function ProjectDashboard() {
                 <span className="ml-2 text-2xl font-bold text-purple-400">Pixel</span>
             </div>
             <Button className="h-10 w-32 bg-purple-600 text-white hover:bg-purple-700 rounded-sm" 
-            onClick={handleLogout}
+            // onClick={handleLogout}
             >Logout</Button>
         </div>
       </nav>
