@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ImageIcon, Layers, VideoIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Layers } from "lucide-react";
 import * as fabric from 'fabric';
 import { Canvas, Rect } from 'fabric';
 import Video from "../appComponents/Video";
+import ImageComponent from '../appComponents/ImageComponent';
 
 function Page() {
 
@@ -36,30 +36,6 @@ function Page() {
 
   }, [] )
 
-  // const addRectangle = () => {
-
-  //   if(canvas){
-  //     console.log("canvas is available");
-  //   }
-  //   else{
-  //     console.log("canvas is not avlbl");
-      
-  //   }
-
-  //   if(canvas){
-  //     const rect = new Rect({
-  //       top: 100,
-  //       left: 50,
-  //       width: 100,
-  //       height: 60,
-  //       fill: "#D84D42",
-  //     });
-
-  //     canvas.add(rect);
-  //     console.log("rectangle added");
-  //   }
-  // }
-
   return (
     <div className="flex flex-col min-h-screen w-full">
       <nav className="bg-gray-900 text-gray-100 p-4">
@@ -76,15 +52,8 @@ function Page() {
       <main className="min-h-screen bg-gray-800 flex justify-center items-center overflow-hidden">
         <aside className="h-[30rem] w-64 flex flex-col justify-center items-center gap-y-5 rounded-lg bg-gray-100 p-4">
           
-          {/* IMAGE UPLOAD BUTTON */}
-          <Button
-            className="justify-start border border-black"
-            variant="outline"
-          >
-            <ImageIcon className="mr-2 h-4 w-4" />
-            Image
-            <span className="sr-only">Insert Image</span>
-          </Button>
+          {/* IMAGE UPLOAD COMPONENT BUTTON */}
+          <ImageComponent canvas={canvas} />
 
           {/* VIDEO UPLOAD BUTTON AS WELL AS THE CANVAS */}
           <Video canvas={canvas} canvasRef={canvasRef} />

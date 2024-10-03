@@ -3,25 +3,28 @@ import { Image as FabricImage } from "fabric";
 import { Button } from "@/components/ui/button";
 import { VideoIcon } from "lucide-react";
 
-function Video({ canvas, canvasRef }: any) {
+function Video({ canvas }: any) {
+
+  // ALL STATES ARE HERE
   const [videoSource, setVideoSource] = useState<string | null>(null);
   // @ts-ignore
   const [fabricVideo, setFabricVideo] = useState<any>(null);
-    const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
+  // ALL REFS ARE HERE
   const inputRef = useRef<any>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
 
+  // FUNCTIONS START FROM HERE
   const handleUploadClick = () => {
     inputRef.current?.click();
   };
 
   const updateCanvas = () => {
     if (fabricVideo && videoRef.current) {
-      fabricVideo.dirty = true; // Mark the fabric object as needing to be redrawn
-      canvas.renderAll(); // Render the updated canvas
-      animationFrameRef.current = requestAnimationFrame(updateCanvas); // Continue the animation loop
+      fabricVideo.dirty = true; 
+      canvas.renderAll(); 
+      animationFrameRef.current = requestAnimationFrame(updateCanvas); 
     }
   };
 
@@ -77,7 +80,7 @@ function Video({ canvas, canvasRef }: any) {
       } )
 
       videoElement.addEventListener("ended", () => {
-        // Restart the video when it ends for looping
+        // RESTARTING THE VIDEO AS SOON AS IT ENDS
         videoElement.currentTime = 0;
         videoElement.play();
       });
@@ -86,10 +89,12 @@ function Video({ canvas, canvasRef }: any) {
     }
   };
 
+  // USE EFFECTS START FROM HERE
   useEffect(() => {
+    // ANIMATION CLEANUP
     return () => {
       if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current); // Clean up animation frame when the component unmounts
+        cancelAnimationFrame(animationFrameRef.current); 
       }
     };
   }, []);
