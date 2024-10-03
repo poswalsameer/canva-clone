@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Image as FabricImage } from "fabric";
 import { Button } from "@/components/ui/button";
 import { VideoIcon } from "lucide-react";
@@ -11,9 +11,18 @@ function Video({ canvas, canvasRef }: any) {
 
   const inputRef = useRef<any>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
 
   const handleUploadClick = () => {
     inputRef.current?.click();
+  };
+
+  const updateCanvas = () => {
+    if (fabricVideo && videoRef.current) {
+      fabricVideo.dirty = true; // Mark the fabric object as needing to be redrawn
+      canvas.renderAll(); // Render the updated canvas
+      animationFrameRef.current = requestAnimationFrame(updateCanvas); // Continue the animation loop
+    }
   };
 
   const handleVideoUpload = (e: any) => {
@@ -59,6 +68,8 @@ function Video({ canvas, canvasRef }: any) {
         canvas.renderAll();
 
         videoElement.play();
+        videoRef.current = videoElement;
+        animationFrameRef.current = requestAnimationFrame(updateCanvas);
       });
 
       videoElement.addEventListener( "error", (error) => {
@@ -71,11 +82,17 @@ function Video({ canvas, canvasRef }: any) {
         videoElement.play();
       });
 
-      videoRef.current = videoElement;
+      // videoRef.current = videoElement;
     }
   };
 
-
+  useEffect(() => {
+    return () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current); // Clean up animation frame when the component unmounts
+      }
+    };
+  }, []);
 
   return (
     <div>
